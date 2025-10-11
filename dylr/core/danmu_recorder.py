@@ -1,5 +1,6 @@
 # coding=utf-8
 import _thread
+import datetime
 import gzip
 import os
 import time
@@ -85,12 +86,15 @@ class DanmuRecorder:
                 self.danmu_amount += 1
                 self.last_danmu_time = now
                 user = data['user']['nickName']
+                short_id = data['user']['shortId']
                 content = data['content']
+                beijing_time = (datetime.datetime.fromtimestamp(now, tz=datetime.timezone.utc).astimezone(datetime.timezone(datetime.timedelta(hours=8))))
+                now_time = beijing_time.isoformat(timespec='seconds')
                 # 写入单条数据
                 with open(self.filename, 'a', encoding='UTF-8') as file:
-                    file.write(f"  <d p=\"{round(second, 2)},1,25,16777215,"
-                               f"{int(now * 1000)},0,1602022773,0\" user=\"{user}\">{content}</d>\n")
-                # print(data['user']['nickName'] + ': ' + data['content'])
+                    file.write(f"  <d p=\"{round(second, 2)},"
+                               f"{now_time}\" id=\"{short_id}\" user=\"{user}\">{content}</d>\n")
+                # print(data['user'])
 
     def _heartbeat(self, ws: websocket.WebSocketApp):
         t = 9
